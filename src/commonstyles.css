@@ -163,3 +163,33 @@ input:focus {
     outline: none;
     border-color: var(--accent-color);
 }
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+    header {
+        padding: 1rem;
+    }
+
+    main {
+        padding: 1.5rem 1rem;
+        width: 100%;
+    }
+
+        /* Prevent buttons causing horizontal overflow on small screens
+           Make buttons stack and fill the container width for better touch targets */
+        .btn, button {
+            box-sizing: border-box;
+            display: flex;
+            width: 100%;
+            max-width: 100%;
+            white-space: normal; /* allow wrapping instead of overflowing */
+            word-break: break-word;
+            padding: 0.6rem 1rem; /* slightly reduce padding on mobile */
+            justify-content: center;
+        }
+
+        /* space between stacked buttons */
+        .btn + .btn, button {
+            margin-top: 0.6rem;
+    }
+}

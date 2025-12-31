@@ -153,4 +153,68 @@
         );
     };
 
+    // 6. PWA SERVICE WORKER REGISTRATION
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            // Adjust path if we are in a subdirectory (like documentation)
+            const swPath = window.location.pathname.includes('/documentation/') ? '../sw.js' : 'sw.js';
+            
+            navigator.serviceWorker.register(swPath)
+                .then(reg => console.log('SW registered:', reg.scope))
+                .catch(err => console.log('SW registration failed:', err));
+        });
+    }
+
+    // 7. NETWORK STATUS MONITOR
+    // Warns user when internet connection is lost with a red bar
+    window.VerticonUtils.initNetworkStatusMonitor = function() {
+        const warningId = 'offline-warning-bar';
+
+        const showWarning = () => {
+            if (document.getElementById(warningId)) return;
+
+            const bar = document.createElement('div');
+            bar.id = warningId;
+            bar.innerHTML = `
+                <span class="material-icons" style="vertical-align: middle; font-size: 20px; margin-right: 8px;">wifi_off</span>
+                <span>Connection Lost - You are currently offline</span>
+            `;
+            
+            Object.assign(bar.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                backgroundColor: '#d32f2f',
+                color: '#ffffff',
+                textAlign: 'center',
+                padding: '12px 0',
+                zIndex: '10000',
+                fontWeight: '500',
+                fontFamily: 'inherit',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease'
+            });
+
+            document.body.prepend(bar);
+        };
+
+        const hideWarning = () => {
+            const bar = document.getElementById(warningId);
+            if (bar) bar.remove();
+        };
+
+        window.addEventListener('offline', showWarning);
+        window.addEventListener('online', hideWarning);
+
+        // Initial check
+        if (!navigator.onLine) showWarning();
+    };
+
+    // Initialize monitor
+    window.VerticonUtils.initNetworkStatusMonitor();
+
 })();
