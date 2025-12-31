@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadZipBtn = document.getElementById('download-zip-btn');
     const statusMsg = document.getElementById('status-msg');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(compressBtn && compressBtn.parentNode) compressBtn.parentNode.appendChild(convertNewBtn);
+
     // Settings
     const modeRadios = document.getElementsByName('mode');
     const settingAuto = document.getElementById('setting-auto');
@@ -92,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderList();
         compressBtn.style.display = 'inline-flex';
         downloadZipBtn.style.display = 'none';
+        convertNewBtn.style.display = 'none';
         statusMsg.textContent = '';
     }
 
@@ -153,6 +163,21 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI();
     });
 
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', async () => {
+        if (!confirm('Clear all and start over?')) return;
+        await VerticonDB.clearStore();
+        filesArray.length = 0;
+        renderList();
+        updateUI();
+        
+        compressBtn.style.display = 'inline-flex';
+        downloadZipBtn.style.display = 'none';
+        convertNewBtn.style.display = 'none';
+        statusMsg.textContent = '';
+        // Reset inputs if needed, but keeping settings is usually preferred
+    });
+
     // --- 3. Compression Logic ---
     compressBtn.addEventListener('click', async () => {
         compressBtn.disabled = true;
@@ -197,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             compressBtn.style.display = 'none';
             downloadZipBtn.style.display = 'inline-flex';
+            convertNewBtn.style.display = 'inline-flex';
             statusMsg.textContent = "Done!";
             compressBtn.disabled = false;
             compressBtn.innerHTML = `<span class="material-icons">compress</span> Compress All`;

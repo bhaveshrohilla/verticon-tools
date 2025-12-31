@@ -16,7 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalGrid = document.getElementById('modal-grid');
     const modal = document.getElementById('large-doc-modal');
     const saveBtn = document.getElementById('save-btn');
-    const convertNewBtn = document.getElementById('convert-new-btn');
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(saveBtn && saveBtn.parentNode) saveBtn.parentNode.appendChild(convertNewBtn);
+
     const statusMsg = document.getElementById('status-msg');
     const filenameDisplay = document.getElementById('filename-display');
 
@@ -249,7 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
             link.click();
 
             saveBtn.innerHTML = `<span class="material-icons">check</span> Done`;
-            setTimeout(() => { saveBtn.innerHTML = `<span class="material-icons">save</span> Save PDF`; saveBtn.disabled = false; }, 2000);
+            setTimeout(() => { 
+                saveBtn.innerHTML = `<span class="material-icons">save</span> Save PDF`; 
+                saveBtn.disabled = false;
+                convertNewBtn.style.display = 'inline-flex';
+            }, 2000);
 
         } catch (err) {
             console.error(err);

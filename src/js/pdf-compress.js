@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const compressBtn = document.getElementById('compress-btn');
     const downloadBtn = document.getElementById('download-btn');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(compressBtn && compressBtn.parentNode) compressBtn.parentNode.appendChild(convertNewBtn);
+
     let currentFileId = null;
 
     // --- Drag & Drop ---
@@ -48,6 +57,23 @@ document.addEventListener('DOMContentLoaded', () => {
         stepProcess.classList.remove('step-hidden');
         stepProcess.classList.add('step-active');
     }
+
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', async () => {
+        await VerticonDB.clearStore();
+        currentFileId = null;
+        
+        compressBtn.style.display = 'inline-flex';
+        compressBtn.innerHTML = `<span class="material-icons">compress</span> Compress PDF`;
+        compressBtn.disabled = false;
+        downloadBtn.style.display = 'none';
+        convertNewBtn.style.display = 'none';
+        statusText.textContent = '';
+        stepProcess.classList.remove('step-active');
+        stepProcess.classList.add('step-hidden');
+        stepUpload.classList.remove('step-hidden');
+        stepUpload.classList.add('step-active');
+    });
 
     // --- Compress Logic ---
     compressBtn.addEventListener('click', async () => {
@@ -96,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Swap Buttons
             compressBtn.style.display = 'none';
             downloadBtn.style.display = 'inline-flex';
+            convertNewBtn.style.display = 'inline-flex';
 
         } catch (error) {
             console.error(error);

@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadZipBtn = document.getElementById('download-zip-btn');
     const statusMsg = document.getElementById('status-msg');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(resizeBtn && resizeBtn.parentNode) resizeBtn.parentNode.appendChild(convertNewBtn);
+
     // Settings
     const widthInput = document.getElementById('width-input');
     const heightInput = document.getElementById('height-input');
@@ -85,6 +94,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Init state
     if(maintainRatioCheck.checked) ratioIcon.parentElement.classList.add('active');
 
+    // Reset to "Resize" state when settings change
+    const resetToResizeState = () => {
+        if (filesArray.length > 0 && downloadZipBtn.style.display !== 'none') {
+            resizeBtn.style.display = 'inline-flex';
+            downloadZipBtn.style.display = 'none';
+            convertNewBtn.style.display = 'none';
+            statusMsg.textContent = '';
+        }
+    };
+
+    widthInput.addEventListener('input', resetToResizeState);
+    heightInput.addEventListener('input', resetToResizeState);
+    maintainRatioCheck.addEventListener('change', resetToResizeState);
+    formatSelect.addEventListener('change', resetToResizeState);
+
     function renderList() {
         imageList.innerHTML = '';
         filesArray.forEach((item, index) => {
@@ -136,6 +160,22 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI();
     });
 
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', async () => {
+        if (!confirm('Clear all and start over?')) return;
+        await VerticonDB.clearStore();
+        filesArray.length = 0;
+        renderList();
+        updateUI();
+        
+        resizeBtn.style.display = 'inline-flex';
+        downloadZipBtn.style.display = 'none';
+        convertNewBtn.style.display = 'none';
+        statusMsg.textContent = '';
+        
+        // Optional: Reset inputs to defaults if needed
+    });
+
     // --- 3. Resize Logic ---
     resizeBtn.addEventListener('click', async () => {
         const targetW = parseInt(widthInput.value);
@@ -174,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             resizeBtn.style.display = 'none';
             downloadZipBtn.style.display = 'inline-flex';
+            convertNewBtn.style.display = 'inline-flex';
             statusMsg.textContent = "Done!";
             resizeBtn.disabled = false;
             resizeBtn.innerHTML = `<span class="material-icons">transform</span> Resize & Download`;

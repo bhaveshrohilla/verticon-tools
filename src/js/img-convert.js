@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('process-canvas');
     const ctx = canvas.getContext('2d');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(convertBtn && convertBtn.parentNode) convertBtn.parentNode.appendChild(convertNewBtn);
+
     // --- 1. File Handling ---
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
@@ -138,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         convertBtn.style.display = 'inline-flex';
         downloadZipBtn.style.display = 'none';
         statusMsg.textContent = '';
+        convertNewBtn.style.display = 'none';
     }
 
     // Global Format Change
@@ -160,6 +170,21 @@ document.addEventListener('DOMContentLoaded', () => {
         filesArray.length = 0;
         renderList();
         updateUI();
+    });
+
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', async () => {
+        if (!confirm('Clear all and start over?')) return;
+        await VerticonDB.clearStore();
+        filesArray.forEach(f => URL.revokeObjectURL(f.thumb));
+        filesArray.length = 0;
+        renderList();
+        updateUI();
+        
+        convertBtn.style.display = 'inline-flex';
+        downloadZipBtn.style.display = 'none';
+        convertNewBtn.style.display = 'none';
+        statusMsg.textContent = '';
     });
 
     // --- 3. Conversion Logic ---
@@ -203,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             convertBtn.style.display = 'none';
             downloadZipBtn.style.display = 'inline-flex';
+            convertNewBtn.style.display = 'inline-flex';
             statusMsg.textContent = "Conversion complete!";
             convertBtn.disabled = false;
             convertBtn.innerHTML = `<span class="material-icons">sync</span> Convert All`;

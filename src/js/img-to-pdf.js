@@ -17,11 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageSizeSelect = document.getElementById('page-size');
     const layoutGroup = document.getElementById('layout-group');
     const pageLayoutSelect = document.getElementById('page-layout');
+    const orientationGroup = document.getElementById('orientation-group');
+    const pageOrientationSelect = document.getElementById('page-orientation');
 
     // Set default page size to A4 and update layout visibility accordingly
     if (pageSizeSelect) {
         pageSizeSelect.value = 'A4';
         layoutGroup.style.display = (pageSizeSelect.value === 'fit') ? 'none' : 'flex';
+        if (orientationGroup) orientationGroup.style.display = (pageSizeSelect.value === 'fit') ? 'none' : 'flex';
     }
 
     let isExpanded = false;
@@ -29,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toggle layout options based on page size
     pageSizeSelect.addEventListener('change', (e) => {
         layoutGroup.style.display = (e.target.value === 'fit') ? 'none' : 'flex';
+        if (orientationGroup) orientationGroup.style.display = (e.target.value === 'fit') ? 'none' : 'flex';
     });
 
     // Clear previous session data
@@ -214,7 +218,27 @@ document.addEventListener('DOMContentLoaded', () => {
                             pageHeight = image.height;
                         } else {
                             // Standard Page Size
-                            [pageWidth, pageHeight] = PageSizes[pageSize];
+                            let [baseWidth, baseHeight] = PageSizes[pageSize];
+
+                            // Orientation preference: auto (detect) | portrait | landscape
+                            const orientationPref = pageOrientationSelect ? pageOrientationSelect.value : 'auto';
+                            const isPortrait = image.height > image.width;
+
+                            if (orientationPref === 'portrait') {
+                                if (baseWidth > baseHeight) [baseWidth, baseHeight] = [baseHeight, baseWidth];
+                            } else if (orientationPref === 'landscape') {
+                                if (baseHeight > baseWidth) [baseWidth, baseHeight] = [baseHeight, baseWidth];
+                            } else {
+                                // auto-detect from image
+                                if (isPortrait && baseWidth > baseHeight) {
+                                    [baseWidth, baseHeight] = [baseHeight, baseWidth];
+                                } else if (!isPortrait && baseHeight > baseWidth) {
+                                    [baseWidth, baseHeight] = [baseHeight, baseWidth];
+                                }
+                            }
+
+                            pageWidth = baseWidth;
+                            pageHeight = baseHeight;
 
                             if (layoutMode === 'stretch') {
                                 w = pageWidth;

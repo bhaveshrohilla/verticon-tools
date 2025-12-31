@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetRotationsBtn = document.getElementById('reset-rotations-btn');
     const zoomModal = document.getElementById('zoom-modal');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(saveBtn && saveBtn.parentNode) saveBtn.parentNode.appendChild(convertNewBtn);
+
     // Quick Tab Elements
     const scopeSelect = document.getElementById('scope-select');
     const pageInputGroup = document.getElementById('page-input-group');
@@ -208,6 +217,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     zoomModal.addEventListener('click', () => zoomModal.style.display = 'none');
 
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', () => {
+        location.reload();
+    });
+
     // --- 7. Save PDF ---
     saveBtn.addEventListener('click', async () => {
         saveBtn.disabled = true;
@@ -231,7 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
             link.click();
 
             saveBtn.innerHTML = `<span class="material-icons">check</span> Done`;
-            setTimeout(() => { saveBtn.disabled = false; saveBtn.innerHTML = `<span class="material-icons">save</span> Save PDF`; }, 2000);
+            setTimeout(() => { 
+                saveBtn.disabled = false; 
+                saveBtn.innerHTML = `<span class="material-icons">save</span> Save PDF`;
+                convertNewBtn.style.display = 'inline-flex';
+            }, 2000);
         } catch (e) {
             console.error(e);
             alert("Error saving PDF.");

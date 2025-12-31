@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const summaryText = document.getElementById('selection-summary');
     const splitBtn = document.getElementById('split-btn');
     const rangeInput = document.getElementById('range-input');
+
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(splitBtn && splitBtn.parentNode) splitBtn.parentNode.appendChild(convertNewBtn);
     
     // --- 1. File Handling ---
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -170,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSummary();
     });
 
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', () => {
+        location.reload();
+    });
+
     // --- 5. Split & Download Logic ---
     splitBtn.addEventListener('click', async () => {
         let finalPagesToExtract = [];
@@ -217,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             splitBtn.innerHTML = `<span class="material-icons">check</span> Downloaded!`;
             setTimeout(() => {
                 splitBtn.innerHTML = `<span class="material-icons">content_cut</span> Split & Download`;
+                convertNewBtn.style.display = 'inline-flex';
             }, 3000);
 
         } catch (err) {

@@ -11,6 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusMsg = document.getElementById('status-msg');
     const downloadLink = document.getElementById('download-link');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(mergeBtn && mergeBtn.parentNode) mergeBtn.parentNode.appendChild(convertNewBtn);
+
     // Clear previous session data
     VerticonDB.clearStore().catch(console.error);
 
@@ -38,6 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleFiles(files) {
         // Reset download link if new files are added
         downloadLink.style.display = 'none';
+        convertNewBtn.style.display = 'none';
+        mergeBtn.style.display = 'inline-flex';
+        mergeBtn.innerHTML = `<span class="material-icons">call_merge</span> Merge PDFs`;
+        statusMsg.textContent = '';
         
         for (const file of Array.from(files)) {
             if (file.type === 'application/pdf') {
@@ -86,6 +99,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', async () => {
+        if (!confirm('Clear all files and start over?')) return;
+        await VerticonDB.clearStore();
+        filesArray.length = 0;
+        fileListEl.innerHTML = '';
+        
+        mergeBtn.style.display = 'inline-flex';
+        mergeBtn.innerHTML = `<span class="material-icons">call_merge</span> Merge PDFs`;
+        downloadLink.style.display = 'none';
+        convertNewBtn.style.display = 'none';
+        statusMsg.textContent = '';
+        updateUI();
+    });
+
     // --- 3. Merge Logic (Client-Side) ---
     mergeBtn.addEventListener('click', async () => {
         if (filesArray.length < 2) return;
@@ -122,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadLink.href = url;
             downloadLink.download = `verticon_merged_${Date.now()}.pdf`;
             downloadLink.style.display = 'inline-flex';
+            convertNewBtn.style.display = 'inline-flex';
             
             statusMsg.textContent = "Merge complete!";
             mergeBtn.innerHTML = `<span class="material-icons">check</span> Done`;

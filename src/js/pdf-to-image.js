@@ -20,6 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const convertBtn = document.getElementById('convert-btn');
     const resetBtn = document.getElementById('reset-btn');
 
+    // Create Convert New Button dynamically
+    const convertNewBtn = document.createElement('button');
+    convertNewBtn.id = 'convert-new-btn';
+    convertNewBtn.className = 'btn';
+    convertNewBtn.style.display = 'none';
+    convertNewBtn.style.marginLeft = '10px';
+    convertNewBtn.innerHTML = `<span class="material-icons">refresh</span> Convert New`;
+    if(convertBtn && convertBtn.parentNode) convertBtn.parentNode.appendChild(convertNewBtn);
+
     // Modal Elements
     const modal = document.getElementById('selection-modal');
     const modalGrid = document.getElementById('modal-grid');
@@ -140,6 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
     modalDoneBtn.addEventListener('click', () => modal.style.display = 'none');
 
+    // Convert New Logic
+    convertNewBtn.addEventListener('click', () => {
+        location.reload();
+    });
+
     // --- 4. Convert & Download ---
     convertBtn.addEventListener('click', async () => {
         const format = document.querySelector('input[name="format"]:checked').value; // 'png' or 'jpeg'
@@ -202,7 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             statusMsg.textContent = "Download started!";
             convertBtn.innerHTML = `<span class="material-icons">check</span> Done`;
-            setTimeout(() => { convertBtn.disabled = false; convertBtn.innerHTML = `<span class="material-icons">folder_zip</span> Convert & Download ZIP`; }, 3000);
+            setTimeout(() => { 
+                convertBtn.disabled = false; 
+                convertBtn.innerHTML = `<span class="material-icons">folder_zip</span> Convert & Download ZIP`;
+                convertNewBtn.style.display = 'inline-flex';
+            }, 3000);
 
         } catch (err) {
             console.error(err);
