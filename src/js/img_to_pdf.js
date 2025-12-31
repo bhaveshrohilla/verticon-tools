@@ -305,6 +305,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Shared Conversion Logic ---
+    async function performConversion() {
+        const { PDFDocument } = PDFLib;
+        const pdfDoc = await PDFDocument.create();
+        
+        const pageSize = pageSizeSelect.value;
+        const layoutMode = pageLayoutSelect.value;
+        
+        let processedCount = 0;
+        
+        for (const fileMeta of filesArray) {
+            try {
+                const file = await VerticonDB.getFile(fileMeta.id);
+                if (!file) {
+                    console.warn(`File not found: ${fileMeta.name}`);
+                    continue;
+                }
+                
+                const arrayBuffer = await file.arrayBuffer();
+                let image;
+                
+                if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                    image = await pdfDoc.embedJpg(arrayBuffer);
+                } else if (file.type === 'image/png') {
+                    image = await pdfDoc.embedPng(arrayBuffer);
+                }
+
+                if (image) {
+                    addImageToPage(pdfDoc, image, pageSize, layoutMode);
+                    processedCount++;
+                }
+            } catch (err) {
+                console.error(`Error processing ${fileMeta.name}:`, err);
+            }
+        }
+
+        if (processedCount === 0) {
+            throw new Error('No images could be processed.');
+        }
+
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        return { url, processedCount };
+    }
+
     // --- Conversion Logic ---
     convertBtn.addEventListener('click', async () => {
         if (filesArray.length === 0) return;
@@ -314,47 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
             convertBtn.innerHTML = `<span class="material-icons spin">sync</span> Converting...`;
             statusMsg.textContent = 'Processing images...';
 
-            const { PDFDocument } = PDFLib;
-            const pdfDoc = await PDFDocument. create();
-            
-            const pageSize = pageSizeSelect.value;
-            const layoutMode = pageLayoutSelect.value;
-            
-            let processedCount = 0;
-            
-            for (const fileMeta of filesArray) {
-                try {
-                    const file = await VerticonDB.getFile(fileMeta.id);
-                    if (!file) {
-                        console.warn(`File not found: ${fileMeta. name}`);
-                        continue;
-                    }
-                    
-                    const arrayBuffer = await file.arrayBuffer();
-                    let image;
-                    
-                    if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-                        image = await pdfDoc.embedJpg(arrayBuffer);
-                    } else if (file.type === 'image/png') {
-                        image = await pdfDoc. embedPng(arrayBuffer);
-                    }
-
-                    if (image) {
-                        addImageToPage(pdfDoc, image, pageSize, layoutMode);
-                        processedCount++;
-                    }
-                } catch (err) {
-                    console.error(`Error processing ${fileMeta.name}:`, err);
-                }
-            }
-
-            if (processedCount === 0) {
-                throw new Error('No images could be processed.');
-            }
-
-            const pdfBytes = await pdfDoc. save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const url = URL. createObjectURL(blob);
+            const { url, processedCount } = await performConversion();
 
             downloadLink.href = url;
             downloadLink.download = `verticon_images_${Date.now()}.pdf`;
@@ -364,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadLink.style.display = 'inline-flex';
             if (reconvertBtn) reconvertBtn.style.display = 'none';
             if (convertNewBtn) convertNewBtn.style.display = 'inline-flex';
-            statusMsg. textContent = `Conversion complete! ${processedCount} of ${filesArray.length} images processed.`;
+            statusMsg.textContent = `Conversion complete! ${processedCount} of ${filesArray.length} images processed.`;
 
         } catch (error) {
             console.error('Conversion error:', error);
@@ -393,47 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 reconvertBtn.innerHTML = `<span class="material-icons spin">sync</span> Reconverting...`;
                 statusMsg.textContent = 'Processing images with new settings...';
 
-                const { PDFDocument } = PDFLib;
-                const pdfDoc = await PDFDocument.create();
-                
-                const pageSize = pageSizeSelect.value;
-                const layoutMode = pageLayoutSelect.value;
-                
-                let processedCount = 0;
-                
-                for (const fileMeta of filesArray) {
-                    try {
-                        const file = await VerticonDB.getFile(fileMeta.id);
-                        if (!file) {
-                            console.warn(`File not found: ${fileMeta.name}`);
-                            continue;
-                        }
-                        
-                        const arrayBuffer = await file.arrayBuffer();
-                        let image;
-                        
-                        if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-                            image = await pdfDoc.embedJpg(arrayBuffer);
-                        } else if (file.type === 'image/png') {
-                            image = await pdfDoc.embedPng(arrayBuffer);
-                        }
-
-                        if (image) {
-                            addImageToPage(pdfDoc, image, pageSize, layoutMode);
-                            processedCount++;
-                        }
-                    } catch (err) {
-                        console.error(`Error processing ${fileMeta.name}:`, err);
-                    }
-                }
-
-                if (processedCount === 0) {
-                    throw new Error('No images could be processed.');
-                }
-
-                const pdfBytes = await pdfDoc.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
+                const { url, processedCount } = await performConversion();
 
                 downloadLink.href = url;
                 downloadLink.download = `verticon_images_${Date.now()}.pdf`;
