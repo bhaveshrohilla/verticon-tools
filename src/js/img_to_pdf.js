@@ -4,37 +4,29 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // UI Elements
     const dropZone = document.getElementById('drop-zone'), fileInput = document.getElementById('file-input');
-    const imageListEl = document.getElementById('image-list'), statusMsg = document.getElementById('status-msg');
-    const convertBtn = document.getElementById('convert-btn'), reprocessBtn = document.getElementById('reprocess-btn');
-    const downloadLink = document.getElementById('download-link'), convertNewBtn = document.getElementById('convert-new-btn'), clearBtn = document.getElementById('clear-btn');
+    const statusMsg = document.getElementById('status-msg'), convertBtn = document.getElementById('convert-btn');
+    const reprocessBtn = document.getElementById('reprocess-btn'), downloadLink = document.getElementById('download-link');
+    const convertNewBtn = document.getElementById('convert-new-btn'), clearBtn = document.getElementById('clear-btn');
     const pageSizeSelect = document.getElementById('page-size'), pageLayoutSelect = document.getElementById('page-layout'), pageOrientationSelect = document.getElementById('page-orientation');
 
-    // --- Advanced Orientation Tool ---
-    // This function reads the image, draws it to canvas (which resets orientation),
-    // and returns a blob of the SAME type (png/jpeg).
-    async function getCorrectedImageBlob(file) {
+    // --- HEAVY DUTY ORIENTATION FIXER ---
+    async function fixImageOrientation(file) {
         return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Set canvas to match image dimensions
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    
-                    // Draw image to "fix" the internal orientation data
-                    ctx.drawImage(img, 0, 0);
-                    
-                    // Export as the original file type to maintain consistency
-                    canvas.toBlob((blob) => resolve(blob || file), file.type, 0.92);
-                };
-                img.onerror = () => resolve(file);
-                img.src = e.target.result;
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Canvas naturally draws images upright regardless of EXIF tags
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                // Export as same type to maintain quality
+                canvas.toBlob((blob) => resolve(blob || file), file.type, 0.95);
+                URL.revokeObjectURL(img.src);
             };
-            reader.readAsDataURL(file);
+            img.src = URL.createObjectURL(file);
         });
     }
 
@@ -45,63 +37,57 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     pageSizeSelect.addEventListener('change', updateLayoutVisibility);
 
-    // --- Reprocess Logic ---
+    // Reprocess Logic: Settings badalne par Download hide karo aur Reprocess dikhao
     [pageSizeSelect, pageLayoutSelect, pageOrientationSelect].forEach(el => {
         el.addEventListener('change', () => {
-            if (reprocessBtn.style.display === 'inline-flex') {
-                statusMsg.textContent = "Settings changed. Click 'Reprocess' to update PDF. 🔄";
-                statusMsg.style.color = "#d9534f"; 
+            if (downloadLink.style.display === 'inline-flex') {
+                statusMsg.textContent = "Settings changed. Click 'Reprocess' to update! 🔄";
+                statusMsg.style.color = "#d9534f";
+                downloadLink.style.display = 'none';
+                reprocessBtn.style.display = 'inline-flex';
             }
         });
     });
 
     async function handleFiles(files) {
         const valid = Array.from(files).filter(f => f.type.startsWith('image/'));
-        statusMsg.textContent = "Processing orientations...";
+        statusMsg.textContent = "Fixing orientations... ⏳";
         
         for (const file of valid) {
-            const id = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            
-            // Fix orientation and keep file type the same
-            const correctedBlob = await getCorrectedImageBlob(file);
-            await VerticonDB.saveFile(id, correctedBlob);
-            
-            filesArray.push({ 
-                id, 
-                name: file.name, 
-                type: file.type, // Store type for PDF embedding
-                thumb: URL.createObjectURL(correctedBlob) 
-            });
+            const id = `img_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            const fixedBlob = await fixImageOrientation(file);
+            await VerticonDB.saveFile(id, fixedBlob);
+            filesArray.push({ id, name: file.name, type: file.type, thumb: URL.createObjectURL(fixedBlob) });
         }
         renderImages();
         updateUI();
     }
 
     function renderImages() {
-        imageListEl.innerHTML = '';
-        filesArray.forEach(f => {
+        const list = document.getElementById('image-list');
+        list.innerHTML = '';
+        filesArray.forEach((f, idx) => {
             const card = document.createElement('div');
             card.className = 'image-card';
             card.innerHTML = `<img src="${f.thumb}" class="image-preview"><button onclick="removeImage('${f.id}')" class="remove-btn material-icons">close</button>`;
-            imageListEl.appendChild(card);
+            list.appendChild(card);
         });
     }
 
     window.removeImage = async (id) => {
         const i = filesArray.findIndex(f => f.id === id);
-        if (i > -1) {
-            URL.revokeObjectURL(filesArray[i].thumb);
-            await VerticonDB.deleteFile(id);
-            filesArray.splice(i, 1);
-            renderImages();
-            updateUI();
-        }
+        URL.revokeObjectURL(filesArray[i].thumb);
+        await VerticonDB.deleteFile(id);
+        filesArray.splice(i, 1);
+        renderImages();
+        updateUI();
     };
 
     function updateUI() {
         const hasFiles = filesArray.length > 0;
         convertBtn.disabled = !hasFiles;
         clearBtn.style.display = hasFiles ? 'inline-flex' : 'none';
+        
         if (!hasFiles) {
             statusMsg.textContent = "Add images to begin.";
             statusMsg.style.color = "";
@@ -114,34 +100,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    clearBtn.addEventListener('click', async () => {
-        if (!confirm("Clear all?")) return;
-        await VerticonDB.clearStore();
-        filesArray.forEach(f => URL.revokeObjectURL(f.thumb));
-        filesArray.length = 0;
-        renderImages();
-        updateUI();
-    });
-
     const generatePDF = async () => {
         try {
-            statusMsg.textContent = "Generating PDF...";
+            statusMsg.textContent = "Generating High Quality PDF... 🚀";
             statusMsg.style.color = "";
-            convertBtn.disabled = true;
-            reprocessBtn.disabled = true;
-
             const pdfDoc = await PDFLib.PDFDocument.create();
+            
             for (const f of filesArray) {
                 const blob = await VerticonDB.getFile(f.id);
                 const bytes = await blob.arrayBuffer();
                 
-                // Embed based on original type
-                let img;
-                if (f.type.includes('png')) {
-                    img = await pdfDoc.embedPng(bytes);
-                } else {
-                    img = await pdfDoc.embedJpg(bytes);
-                }
+                // Embed based on type (PNG vs JPEG)
+                const img = f.type.includes('png') ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
                 
                 let pw, ph, [bw, bh] = PAGE_SIZES[pageSizeSelect.value] || [img.width, img.height];
                 if (pageSizeSelect.value !== 'fit') {
@@ -156,25 +126,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 pdfDoc.addPage([pw, ph]).drawImage(img, { x: (pw-w)/2, y: (ph-h)/2, width: w, height: h });
             }
 
-            const url = URL.createObjectURL(new Blob([await pdfDoc.save()], { type: 'application/pdf' }));
-            downloadLink.href = url;
+            downloadLink.href = URL.createObjectURL(new Blob([await pdfDoc.save()], { type: 'application/pdf' }));
             downloadLink.download = `verticon_${Date.now()}.pdf`;
 
             convertBtn.style.display = 'none';
             reprocessBtn.style.display = 'inline-flex';
-            reprocessBtn.disabled = false;
             downloadLink.style.display = 'inline-flex';
             convertNewBtn.style.display = 'inline-flex';
-            statusMsg.textContent = "PDF Ready! 📥";
+            statusMsg.textContent = "PDF Ready for Download! ✅";
         } catch (e) {
-            console.error(e);
             statusMsg.textContent = "Error: Conversion failed.";
-            reprocessBtn.disabled = false;
         }
     };
 
-    convertBtn.addEventListener('click', generatePDF);
-    reprocessBtn.addEventListener('click', generatePDF);
-    convertNewBtn.onclick = () => location.reload();
+    convertBtn.onclick = generatePDF;
+    reprocessBtn.onclick = generatePDF;
     fileInput.onchange = (e) => handleFiles(e.target.files);
+    clearBtn.onclick = () => { if(confirm("Clear all?")) location.reload(); };
+    convertNewBtn.onclick = () => location.reload();
 });
