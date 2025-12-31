@@ -10,9 +10,20 @@
     <meta name="robots" content="index, follow">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="src/commonstyles.css">
     
     <link rel="stylesheet" href="src/css/tools_home.css"> 
+    <style>
+        /* Mobile overrides for Tool Grid */
+        @media (max-width: 768px) {
+            .tool-grid {
+                grid-template-columns: 1fr !important; /* Force single column */
+                gap: 1rem;
+            }
+            .tool-search { width: 100%; font-size: 16px; } /* Prevent iOS zoom */
+        }
+    </style>
 </head>
 <body>
 
@@ -37,44 +48,44 @@
             </h2>
             <div class="tool-grid">
                 
-                <a href="pdf-merge.html" class="tool-card">
+                <a href="pdf-merge" class="tool-card">
                     <span class="material-icons">call_merge</span>
                     <h3>Merge PDF</h3>
                     <p>Combine multiple PDFs into one.</p>
                 </a>
 
-                <a href="pdf-split.html" class="tool-card">
+                <a href="pdf-split" class="tool-card">
                     <span class="material-icons">call_split</span>
                     <h3>Split PDF</h3>
                     <p>Split by specific pages or ranges.</p>
                 </a>
 
-                <a href="pdf-compress.html" class="tool-card">
+                <a href="pdf-compress" class="tool-card">
                     <span class="material-icons">compress</span>
                     <h3>Compress PDF</h3>
                     <p>Normal mode, no aggressive quality loss.</p>
                 </a>
 
-                <a href="img-to-pdf.html" class="tool-card">
+                <a href="img-to-pdf" class="tool-card">
                     <span class="material-icons">photo_library</span>
                     <h3>Image to PDF</h3>
                     <p>Fit to page, center, top, or bottom alignment.</p>
                 </a>
                 
-                <a href="pdf-rearrange.html" class="tool-card">
+                <a href="pdf-rearrange" class="tool-card">
                     <span class="material-icons">grid_view</span>
                     <h3>Rearrange PDF</h3>
                     <p>GUI-based sorting and page removal.</p>
                 </a>
 
-                <a href="pdf-to-image.html" class="tool-card">
+                <a href="pdf-to-image" class="tool-card">
                     <span class="material-icons">image</span>
                     <h3>PDF to Image</h3>
                     <p>Convert PDF pages to images.</p>
                 </a>
                 
 
-                <a href="pdf-rotate.html" class="tool-card">
+                <a href="pdf-rotate" class="tool-card">
                     <span class="material-icons">rotate_right</span>
                     <h3>Rotate PDF</h3>
                     <p>Rotate pages left or right.</p>
@@ -88,22 +99,28 @@
             </h2>
             <div class="tool-grid">
                 
-                <a href="img-convert.html" class="tool-card">
+                <a href="img-convert" class="tool-card">
                     <span class="material-icons">transform</span>
                     <h3>Converter</h3>
                     <p>PNG, JPG, SVG, ICO, WEBP support.</p>
                 </a>
 
-                <a href="img-compress.html" class="tool-card">
+                <a href="img-compress" class="tool-card">
                     <span class="material-icons">photo_size_select_small</span>
                     <h3>Compressor</h3>
                     <p>Client-side compression.</p>
                 </a>
 
-                <a href="img-resize.html" class="tool-card">
+                <a href="img-resize" class="tool-card">
                     <span class="material-icons">aspect_ratio</span>
                     <h3>Image Resizer</h3>
                     <p>Resize pixels & change format.</p>
+                </a>
+
+                <a href="img-exif" class="tool-card">
+                    <span class="material-icons">info</span>
+                    <h3>EXIF Editor</h3>
+                    <p>View and remove sensitive metadata.</p>
                 </a>
             </div>
         </div>
@@ -114,13 +131,13 @@
             </h2>
             <div class="tool-grid">
                 
-                <a href="idf-platform.html" class="tool-card">
+                <a href="idf-platform" class="tool-card">
                     <span class="material-icons">edit_note</span>
                     <h3>IDF Editor</h3>
                     <p>Create secure, interactive documents.</p>
                 </a>
 
-                <a href="idf-platform.html" class="tool-card">
+                <a href="idf-platform" class="tool-card">
                     <span class="material-icons">visibility</span>
                     <h3>IDF Viewer</h3>
                     <p>Open and interact with .idf files.</p>

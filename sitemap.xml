@@ -5,55 +5,55 @@
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/home.html</loc>
+        <loc>https://verticon.tech/tools/home</loc>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/pdf-merge.html</loc>
+        <loc>https://verticon.tech/tools/pdf-merge</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/pdf-split.html</loc>
+        <loc>https://verticon.tech/tools/pdf-split</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/pdf-compress.html</loc>
+        <loc>https://verticon.tech/tools/pdf-compress</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/img-to-pdf.html</loc>
+        <loc>https://verticon.tech/tools/img-to-pdf</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/pdf-rearrange.html</loc>
+        <loc>https://verticon.tech/tools/pdf-rearrange</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/pdf-to-image.html</loc>
+        <loc>https://verticon.tech/tools/pdf-to-image</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/pdf-rotate.html</loc>
+        <loc>https://verticon.tech/tools/pdf-rotate</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/img-convert.html</loc>
+        <loc>https://verticon.tech/tools/img-convert</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/img-compress.html</loc>
+        <loc>https://verticon.tech/tools/img-compress</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/img-resize.html</loc>
+        <loc>https://verticon.tech/tools/img-resize</loc>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/privacy.html</loc>
+        <loc>https://verticon.tech/tools/privacy</loc>
         <priority>0.5</priority>
     </url>
     <url>
-        <loc>https://verticon.tech/tools/terms.html</loc>
+        <loc>https://verticon.tech/tools/terms</loc>
         <priority>0.5</priority>
     </url>
 </urlset>

@@ -6,6 +6,7 @@
     <title>Verticon Tools - IDF Platform</title>
     <meta name="description" content="Learn about IDF (Interactive Document Format) - Safe, fast, and easy to use.">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="manifest" href="../manifest.json">
     <link rel="stylesheet" href="../src/commonstyles.css">
     <style>
         main {
@@ -50,6 +51,11 @@
         .back-link:hover {
             color: var(--text-color);
         }
+        @media (max-width: 768px) {
+            main { padding: 2rem 1rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.3rem; }
+        }
     </style>
 </head>
 <body>
@@ -62,7 +68,7 @@
     </header>
 
     <main class="fade-in">
-        <a href="../home.html" class="back-link">
+        <a href="home" class="back-link">
             <span class="material-icons" style="font-size: 1.2rem; margin-right: 0.5rem;">arrow_back</span>
             Back to Tools
         </a>

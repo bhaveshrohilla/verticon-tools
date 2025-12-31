@@ -50,7 +50,7 @@
 
     <header class="fade-in">
         <div class="logo">Verticon <span class="logogrey">/ Image to PDF</span></div>
-        <a href="home.html" class="btn-icon"><span class="material-icons">close</span></a>
+        <a href="home" class="btn-icon"><span class="material-icons">close</span></a>
     </header>
 
     <main class="fade-in">
@@ -75,6 +75,14 @@
                         <option value="A4">A4</option>
                         <option value="Letter">Letter</option>
                         <option value="Legal">Legal</option>
+                    </select>
+                </div>
+                <div class="setting-group" id="orientation-group" style="display: none;">
+                    <label for="page-orientation">Orientation</label>
+                    <select id="page-orientation">
+                        <option value="auto" selected>Auto (Detect from image)</option>
+                        <option value="portrait">Force Portrait</option>
+                        <option value="landscape">Force Landscape</option>
                     </select>
                 </div>
                 <div class="setting-group" id="layout-group" style="display: none;">
