@@ -48,8 +48,8 @@ const FALLBACK_ASSETS = [
     'idf-platform',
     'img_exif',
     'src/css/img-exif.css',
-    'src/js/img-exif.js'
-
+    'src/js/img-exif.js',
+    'src/js/img_to_pdf.js' 
 ];
 
 const EXTERNAL_LIBS = [
@@ -114,4 +114,5 @@ self.addEventListener('fetch', (event) => {
             });
         })
     );
+
 });
