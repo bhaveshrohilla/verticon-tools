@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- State Management ---
     const filesArray = [];
+    let hasConverted = false;
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const imageListEl = document.getElementById('image-list');
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadLink = document.getElementById('download-link');
     const clearBtn = document.getElementById('clear-btn');
     const convertNewBtn = document.getElementById('convert-new-btn');
+    const reconvertBtn = document.getElementById('reconvert-btn');
     
     // Settings Elements
     const pageSizeSelect = document.getElementById('page-size');
@@ -100,13 +102,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Event Listeners: Settings ---
-    pageSizeSelect. addEventListener('change', updateLayoutVisibility);
+    pageSizeSelect. addEventListener('change', () => {
+        updateLayoutVisibility();
+        handleSettingChange();
+    });
+
+    if (pageOrientationSelect) {
+        pageOrientationSelect.addEventListener('change', handleSettingChange);
+    }
+
+    if (pageLayoutSelect) {
+        pageLayoutSelect.addEventListener('change', handleSettingChange);
+    }
 
     function updateLayoutVisibility() {
         const isFitMode = pageSizeSelect.value === 'fit';
         layoutGroup.style.display = isFitMode ? 'none' : 'flex';
         if (orientationGroup) {
             orientationGroup.style.display = isFitMode ? 'none' :  'flex';
+        }
+    }
+
+    function handleSettingChange() {
+        if (hasConverted) {
+            downloadLink.style.display = 'none';
+            if (reconvertBtn) {
+                reconvertBtn.style.display = 'inline-flex';
+            }
+            statusMsg.textContent = 'Settings changed. Click Reconvert to generate a new PDF with updated settings.';
         }
     }
 
@@ -282,6 +305,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Shared Conversion Logic ---
+    async function performConversion() {
+        const { PDFDocument } = PDFLib;
+        const pdfDoc = await PDFDocument.create();
+        
+        const pageSize = pageSizeSelect.value;
+        const layoutMode = pageLayoutSelect.value;
+        
+        let processedCount = 0;
+        
+        for (const fileMeta of filesArray) {
+            try {
+                const file = await VerticonDB.getFile(fileMeta.id);
+                if (!file) {
+                    console.warn(`File not found: ${fileMeta.name}`);
+                    continue;
+                }
+                
+                const arrayBuffer = await file.arrayBuffer();
+                let image;
+                
+                if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                    image = await pdfDoc.embedJpg(arrayBuffer);
+                } else if (file.type === 'image/png') {
+                    image = await pdfDoc.embedPng(arrayBuffer);
+                }
+
+                if (image) {
+                    addImageToPage(pdfDoc, image, pageSize, layoutMode);
+                    processedCount++;
+                }
+            } catch (err) {
+                console.error(`Error processing ${fileMeta.name}:`, err);
+            }
+        }
+
+        if (processedCount === 0) {
+            throw new Error('No images could be processed.');
+        }
+
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        return { url, processedCount };
+    }
+
     // --- Conversion Logic ---
     convertBtn.addEventListener('click', async () => {
         if (filesArray.length === 0) return;
@@ -291,55 +361,17 @@ document.addEventListener('DOMContentLoaded', () => {
             convertBtn.innerHTML = `<span class="material-icons spin">sync</span> Converting...`;
             statusMsg.textContent = 'Processing images...';
 
-            const { PDFDocument } = PDFLib;
-            const pdfDoc = await PDFDocument. create();
-            
-            const pageSize = pageSizeSelect.value;
-            const layoutMode = pageLayoutSelect.value;
-            
-            let processedCount = 0;
-            
-            for (const fileMeta of filesArray) {
-                try {
-                    const file = await VerticonDB.getFile(fileMeta.id);
-                    if (!file) {
-                        console.warn(`File not found: ${fileMeta. name}`);
-                        continue;
-                    }
-                    
-                    const arrayBuffer = await file.arrayBuffer();
-                    let image;
-                    
-                    if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-                        image = await pdfDoc.embedJpg(arrayBuffer);
-                    } else if (file.type === 'image/png') {
-                        image = await pdfDoc. embedPng(arrayBuffer);
-                    }
-
-                    if (image) {
-                        addImageToPage(pdfDoc, image, pageSize, layoutMode);
-                        processedCount++;
-                    }
-                } catch (err) {
-                    console.error(`Error processing ${fileMeta.name}:`, err);
-                }
-            }
-
-            if (processedCount === 0) {
-                throw new Error('No images could be processed.');
-            }
-
-            const pdfBytes = await pdfDoc. save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const url = URL. createObjectURL(blob);
+            const { url, processedCount } = await performConversion();
 
             downloadLink.href = url;
             downloadLink.download = `verticon_images_${Date.now()}.pdf`;
             
+            hasConverted = true;
             convertBtn.style.display = 'none';
             downloadLink.style.display = 'inline-flex';
+            if (reconvertBtn) reconvertBtn.style.display = 'none';
             if (convertNewBtn) convertNewBtn.style.display = 'inline-flex';
-            statusMsg. textContent = `Conversion complete! ${processedCount} of ${filesArray.length} images processed.`;
+            statusMsg.textContent = `Conversion complete! ${processedCount} of ${filesArray.length} images processed.`;
 
         } catch (error) {
             console.error('Conversion error:', error);
@@ -348,6 +380,43 @@ document.addEventListener('DOMContentLoaded', () => {
             convertBtn.disabled = false;
         }
     });
+
+    // --- Reconvert Logic ---
+    if (reconvertBtn) {
+        reconvertBtn.addEventListener('click', async () => {
+            if (filesArray.length === 0) return;
+
+            try {
+                // Revoke old PDF URL if it exists
+                if (downloadLink && downloadLink.href) {
+                    try {
+                        URL.revokeObjectURL(downloadLink.href);
+                    } catch (err) {
+                        console.warn('Failed to revoke download URL:', err);
+                    }
+                }
+
+                reconvertBtn.disabled = true;
+                reconvertBtn.innerHTML = `<span class="material-icons spin">sync</span> Reconverting...`;
+                statusMsg.textContent = 'Processing images with new settings...';
+
+                const { url, processedCount } = await performConversion();
+
+                downloadLink.href = url;
+                downloadLink.download = `verticon_images_${Date.now()}.pdf`;
+                
+                reconvertBtn.style.display = 'none';
+                downloadLink.style.display = 'inline-flex';
+                statusMsg.textContent = `Reconversion complete! ${processedCount} of ${filesArray.length} images processed.`;
+
+            } catch (error) {
+                console.error('Reconversion error:', error);
+                statusMsg.textContent = `Error: ${error.message || 'Failed to reconvert images.'}`;
+                reconvertBtn.innerHTML = `<span class="material-icons">autorenew</span> Reconvert`;
+                reconvertBtn.disabled = false;
+            }
+        });
+    }
 
     function addImageToPage(pdfDoc, image, pageSize, layoutMode) {
         let pageWidth, pageHeight;
@@ -424,10 +493,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 filesArray.length = 0;
                 renderImages();
 
+                hasConverted = false;
                 downloadLink.style.display = 'none';
                 downloadLink.href = '';
                 if (clearBtn) clearBtn.style.display = 'none';
                 convertNewBtn.style.display = 'none';
+                if (reconvertBtn) reconvertBtn.style.display = 'none';
                 convertBtn.style.display = 'inline-flex';
                 convertBtn.disabled = true;
                 statusMsg.textContent = 'Ready for new images.';
