@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verticon Tools - Free Online PDF & Image Utilities</title>
+    <meta name="description" content="Free online tools to merge, split, compress, and convert PDF files and images. Secure, client-side processing for maximum privacy.">
+    <meta name="keywords" content="PDF tools, image tools, client-side, secure, merge PDF, split PDF, compress PDF, convert PDF, image conversion, privacy, WebAssembly"> 
+    <meta name="author" content="Verticon Tech">
+    <meta name="robots" content="index, follow">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <link rel="stylesheet" href="src/commonstyles.css">
+    
+    <link rel="stylesheet" href="src/css/tools_home.css"> 
+</head>
+<body>
+
+    <div id="global-loader">
+        <span class="material-icons" style="font-size: 3rem; animation: spin 1s linear infinite;">sync</span>
+    </div>
+
+    <header class="fade-in">
+        <div class="logo">Verticon <span class="logogrey">Tools</span></div>
+        <a href="../index.html" style="color: #fff; text-decoration: none;"><span class="material-icons">close</span></a>
+    </header>
+
+    <main class="fade-in">
+        
+        <div class="search-container">
+            <input type="text" class="tool-search" placeholder="Find a tool (e.g. Merge, Split, Convert)...">
+        </div>
+
+        <div class="tool-category" data-category="pdf">
+            <h2 class="section-title">
+                <span class="material-icons">picture_as_pdf</span> PDF Utilities
+            </h2>
+            <div class="tool-grid">
+                
+                <a href="pdf-merge.html" class="tool-card">
+                    <span class="material-icons">call_merge</span>
+                    <h3>Merge PDF</h3>
+                    <p>Combine multiple PDFs into one.</p>
+                </a>
+
+                <a href="pdf-split.html" class="tool-card">
+                    <span class="material-icons">call_split</span>
+                    <h3>Split PDF</h3>
+                    <p>Split by specific pages or ranges.</p>
+                </a>
+
+                <a href="pdf-compress.html" class="tool-card">
+                    <span class="material-icons">compress</span>
+                    <h3>Compress PDF</h3>
+                    <p>Normal mode, no aggressive quality loss.</p>
+                </a>
+
+                <a href="img-to-pdf.html" class="tool-card">
+                    <span class="material-icons">photo_library</span>
+                    <h3>Image to PDF</h3>
+                    <p>Fit to page, center, top, or bottom alignment.</p>
+                </a>
+                
+                <a href="pdf-rearrange.html" class="tool-card">
+                    <span class="material-icons">grid_view</span>
+                    <h3>Rearrange PDF</h3>
+                    <p>GUI-based sorting and page removal.</p>
+                </a>
+
+                <a href="pdf-to-image.html" class="tool-card">
+                    <span class="material-icons">image</span>
+                    <h3>PDF to Image</h3>
+                    <p>Convert PDF pages to images.</p>
+                </a>
+                
+
+                <a href="pdf-rotate.html" class="tool-card">
+                    <span class="material-icons">rotate_right</span>
+                    <h3>Rotate PDF</h3>
+                    <p>Rotate pages left or right.</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="tool-category" data-category="image">
+            <h2 class="section-title">
+                <span class="material-icons">image</span> Image Utilities
+            </h2>
+            <div class="tool-grid">
+                
+                <a href="img-convert.html" class="tool-card">
+                    <span class="material-icons">transform</span>
+                    <h3>Converter</h3>
+                    <p>PNG, JPG, SVG, ICO, WEBP support.</p>
+                </a>
+
+                <a href="img-compress.html" class="tool-card">
+                    <span class="material-icons">photo_size_select_small</span>
+                    <h3>Compressor</h3>
+                    <p>Client-side compression.</p>
+                </a>
+
+                <a href="img-resize.html" class="tool-card">
+                    <span class="material-icons">aspect_ratio</span>
+                    <h3>Image Resizer</h3>
+                    <p>Resize pixels & change format.</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="tool-category" data-category="idf">
+            <h2 class="section-title">
+                <span class="material-icons">description</span> IDF Platform
+            </h2>
+            <div class="tool-grid">
+                
+                <a href="idf-platform.html" class="tool-card">
+                    <span class="material-icons">edit_note</span>
+                    <h3>IDF Editor</h3>
+                    <p>Create secure, interactive documents.</p>
+                </a>
+
+                <a href="idf-platform.html" class="tool-card">
+                    <span class="material-icons">visibility</span>
+                    <h3>IDF Viewer</h3>
+                    <p>Open and interact with .idf files.</p>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="src/commonscript.js"></script>
+
+    <script src="src/js/tools_home.js"></script> 
+    <script>
+        // Ensure visited flag is set if user lands here directly
+        document.addEventListener('DOMContentLoaded', () => {
+            VerticonDB.setSetting('visited_home', true).catch(console.error);
+        });
+    </script>
+</body>
+</html>
