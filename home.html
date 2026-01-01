@@ -1,29 +1,119 @@
-<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Verticon Tools - Free Online PDF & Image Utilities</title> <meta name="description" content="Free online tools to merge, split, compress, and convert PDF files and images. Secure, client-side processing for maximum privacy."> <meta name="keywords" content="PDF tools, image tools, client-side, secure, merge PDF, split PDF, compress PDF, convert PDF, image conversion, privacy, WebAssembly"> <meta name="author" content="Verticon Tech"> <meta name="robots" content="index, follow"> <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <link rel="manifest" href="manifest.json"> <link rel="stylesheet" href="src/commonstyles.css"> <link rel="stylesheet" href="src/css/tools_home.css"> <style> /* Mobile overrides for Tool Grid */ @media (max-width: 768px) { .tool-grid { grid-template-columns: 1fr !important; /* Force single column */ gap: 1rem; } .tool-search { width: 100%; font-size: 16px; } /* Prevent iOS zoom */ } /* Mobile menu styles */ .mobile-menu-btn { display: flex; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; padding: 8px; align-items: center; justify-content: center; width: 44px; height: 44px; min-width: 44px; min-height: 44px; } .mobile-menu-btn .material-icons { font-size: 28px; } .mobile-menu { display: none; position: fixed; top: 60px; right: 0; background: white; border-left: 1px solid #e0e0e0; box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1); z-index: 1000; min-width: 200px; animation: slideIn 0.3s ease-out; } .mobile-menu.active { display: block; } @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } .mobile-menu-item { padding: 16px; border-bottom: 1px solid #000000; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; } .mobile-menu-item:last-child { border-bottom: none; } .mobile-menu-item:hover { background: #f9f9f9; } .mobile-menu-item span.material-icons { font-size: 1.25rem; color: #667eea; } .mobile-menu-item-text { font-size: 1rem; color: #222; font-weight: 600; letter-spacing: 0.3px; } .mobile-menu-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 999; } .mobile-menu-overlay.active { display: block; } /* Notification toast */ .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #333; color: white; padding: 16px; border-radius: 8px; z-index: 2000; display: none; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out; } .toast.show { display: flex; } @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } } .toast.success { background: #4caf50; } .toast.error { background: #f44336; } .toast-spinner { width: 20px; height: 20px; border: 2px solid #f3f3f3; border-top: 2px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } header { display: flex; justify-content: space-between; align-items: center; } </style></head><body>
-<div id="global-loader"> <span class="material-icons" style="font-size: 3rem; animation: spin 1s linear infinite;">sync</span> </div>
-<header class="fade-in"> <div class="logo">Verticon <span class="logogrey">Tools</span></div> <div style="display: flex; align-items: center; gap: 16px;"> <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu"> <span class="material-icons">more_vert</span> </button> </div> </header>
-<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div> <div class="mobile-menu" id="mobileMenu"> <div class="mobile-menu-item" id="refreshCacheItem"> <span class="material-icons">refresh</span> <span class="mobile-menu-item-text">Refresh Cache</span> </div> </div>
-<div class="toast" id="toast"></div>
-<main class="fade-in"> <div class="search-container"> <input type="text" class="tool-search" placeholder="Find a tool (e.g. Merge, Split, Convert)..."> </div>
-<div class="tool-category" data-category="pdf"> <h2 class="section-title"> <span class="material-icons">picture_as_pdf</span> PDF Utilities </h2> <div class="tool-grid"> <a href="pdf-merge" class="tool-card"> <span class="material-icons">call_merge</span> <h3>Merge PDF</h3> <p>Combine multiple PDFs into one.</p> </a>
-<a href="pdf-split" class="tool-card"> <span class="material-icons">call_split</span> <h3>Split PDF</h3> <p>Split by specific pages or ranges.</p> </a>
-<a href="pdf-compress" class="tool-card"> <span class="material-icons">compress</span> <h3>Compress PDF</h3> <p>Normal mode, no aggressive quality loss.</p> </a>
-<a href="img-to-pdf" class="tool-card"> <span class="material-icons">photo_library</span> <h3>Image to PDF</h3> <p>Fit to page, center, top, or bottom alignment.</p> </a> <a href="pdf-rearrange" class="tool-card"> <span class="material-icons">grid_view</span> <h3>Rearrange PDF</h3> <p>GUI-based sorting and page removal.</p> </a>
-<a href="pdf-to-image" class="tool-card"> <span class="material-icons">image</span> <h3>PDF to Image</h3> <p>Convert PDF pages to images.</p> </a> 
-<a href="pdf-rotate" class="tool-card"> <span class="material-icons">rotate_right</span> <h3>Rotate PDF</h3> <p>Rotate pages left or right.</p> </a> </div> </div>
-<div class="tool-category" data-category="image"> <h2 class="section-title"> <span class="material-icons">image</span> Image Utilities </h2> <div class="tool-grid"> <a href="img-convert" class="tool-card"> <span class="material-icons">transform</span> <h3>Converter</h3> <p>PNG, JPG, SVG, ICO, WEBP support.</p> </a>
-<a href="img-compress" class="tool-card"> <span class="material-icons">photo_size_select_small</span> <h3>Compressor</h3> <p>Client-side compression.</p> </a>
-<a href="img-resize" class="tool-card"> <span class="material-icons">aspect_ratio</span> <h3>Image Resizer</h3> <p>Resize pixels & change format.</p> </a>
-<a href="img-exif" class="tool-card"> <span class="material-icons">info</span> <h3>EXIF Editor</h3> <p>View and remove sensitive metadata.</p> </a> </div> </div>
-<div class="tool-category" data-category="idf"> <h2 class="section-title"> <span class="material-icons">description</span> IDF Platform </h2> <div class="tool-grid"> <a href="idf-platform" class="tool-card"> <span class="material-icons">edit_note</span> <h3>IDF Editor</h3> <p>Create secure, interactive documents.</p> </a>
-<a href="idf-platform" class="tool-card"> <span class="material-icons">visibility</span> <h3>IDF Viewer</h3> <p>Open and interact with .idf files.</p> </a> </div> </div>
-</main>
-<script src="src/commonscript.js"></script>
-<script src="src/js/tools_home.js"></script> <script> // Mobile menu functionality const mobileMenuBtn = document.getElementById('mobileMenuBtn'); const mobileMenu = document.getElementById('mobileMenu'); const mobileMenuOverlay = document.getElementById('mobileMenuOverlay'); const refreshCacheItem = document.getElementById('refreshCacheItem'); const toast = document.getElementById('toast');
-// Toggle menu mobileMenuBtn.addEventListener('click', () => { mobileMenu.classList.toggle('active'); mobileMenuOverlay.classList.toggle('active'); });
-// Close menu when clicking overlay mobileMenuOverlay.addEventListener('click', () => { mobileMenu.classList.remove('active'); mobileMenuOverlay.classList.remove('active'); });
-// Close menu when clicking menu item refreshCacheItem.addEventListener('click', () => { mobileMenu.classList.remove('active'); mobileMenuOverlay.classList.remove('active'); refreshCache(); });
-// Show toast notification function showToast(message, type = 'info') { toast.textContent = message; toast.className = `toast show ${type}`; if (type !== 'loading') { setTimeout(() => { toast.classList.remove('show'); }, 3000); } }
-// Refresh cache function function refreshCache() { if (!navigator.serviceWorker || !navigator.serviceWorker.controller) { showToast('Service Worker not available', 'error'); return; }
-showToast('Refreshing cache...', 'loading'); // Send message to service worker navigator.serviceWorker.controller.postMessage({ type: 'RECACHE_ALL' });
-// Simulate completion (actual completion would need confirmation from SW) setTimeout(() => { showToast('Cache refreshed successfully!', 'success'); }, 2000); }
-// Ensure visited flag is set if user lands here directly document.addEventListener('DOMContentLoaded', () => { VerticonDB.setSetting('visited_home', true).catch(console.error); }); </script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"500d3ed486f4473287a03044ae4a1bd2","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verticon Tools - Free Online PDF & Image Utilities</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="src/commonstyles.css">
+    <link rel="stylesheet" href="src/css/tools_home.css">
+    <style>
+        /* Mobile fixes */
+        @media (max-width: 768px) { .tool-grid { grid-template-columns: 1fr !important; gap: 1rem; } }
+        
+        /* Mobile menu */
+        .mobile-menu { 
+            display: none; position: fixed; top: 60px; right: 0; background: white; 
+            border-left: 1px solid #eee; box-shadow: -2px 2px 10px rgba(0,0,0,0.1); 
+            z-index: 1000; min-width: 220px; animation: slideIn 0.3s ease-out;
+        }
+        .mobile-menu.active { display: block; }
+        .mobile-menu-item { padding: 16px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .mobile-menu-overlay { display: none; position: fixed; inset: 0; z-index: 999; }
+        .mobile-menu-overlay.active { display: block; }
+
+        /* Toast notifications */
+        .toast { 
+            position: fixed; bottom: 20px; left: 20px; right: 20px; background: #333; 
+            color: white; padding: 16px; border-radius: 12px; z-index: 2000; 
+            display: none; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .toast.show { display: flex; }
+        .toast-spinner { width: 20px; height: 20px; border: 2px solid #f3f3f3; border-top: 2px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+    <div id="global-loader"><span class="material-icons" style="font-size: 3rem; animation: spin 1s linear infinite;">sync</span></div>
+
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+        <div class="logo">Verticon <span class="logogrey">Tools</span></div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" style="background:none; border:none; cursor:pointer;">
+            <span class="material-icons">more_vert</span>
+        </button>
+    </header>
+
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-item" id="refreshCacheItem">
+            <span class="material-icons">refresh</span><span class="mobile-menu-item-text">Refresh Cache</span>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <main class="fade-in">
+        <div class="search-container">
+            <input type="text" class="tool-search" placeholder="Find a tool (e.g. Merge, Split, Convert)...">
+        </div>
+
+        <div class="tool-category" data-category="pdf">
+            <h2 class="section-title"><span class="material-icons">picture_as_pdf</span> PDF Utilities</h2>
+            <div class="tool-grid">
+                <a href="pdf-merge" class="tool-card"><span class="material-icons">call_merge</span><h3>Merge PDF</h3><p>Combine multiple PDFs into one.</p></a>
+                <a href="pdf-split" class="tool-card"><span class="material-icons">call_split</span><h3>Split PDF</h3><p>Split by specific pages or ranges.</p></a>
+                <a href="pdf-compress" class="tool-card"><span class="material-icons">compress</span><h3>Compress PDF</h3><p>Optimize file size.</p></a>
+                <a href="img-to-pdf" class="tool-card"><span class="material-icons">photo_library</span><h3>Image to PDF</h3><p>Fit to page or custom alignment.</p></a>
+                <a href="pdf-rearrange" class="tool-card"><span class="material-icons">grid_view</span><h3>Rearrange PDF</h3><p>Sort or remove pages visually.</p></a>
+                <a href="pdf-to-image" class="tool-card"><span class="material-icons">image</span><h3>PDF to Image</h3><p>Convert pages to images.</p></a>
+                <a href="pdf-rotate" class="tool-card"><span class="material-icons">rotate_right</span><h3>Rotate PDF</h3><p>Rotate pages 90/180/270 degrees.</p></a>
+            </div>
+        </div>
+
+        <div class="tool-category" data-category="image">
+            <h2 class="section-title"><span class="material-icons">image</span> Image Utilities</h2>
+            <div class="tool-grid">
+                <a href="img-convert" class="tool-card"><span class="material-icons">transform</span><h3>Converter</h3><p>PNG, JPG, SVG, ICO, WEBP support.</p></a>
+                <a href="img-compress" class="tool-card"><span class="material-icons">photo_size_select_small</span><h3>Compressor</h3><p>Client-side compression.</p></a>
+                <a href="img-resize" class="tool-card"><span class="material-icons">aspect_ratio</span><h3>Image Resizer</h3><p>Resize and change format.</p></a>
+                <a href="img-exif" class="tool-card"><span class="material-icons">info</span><h3>EXIF Editor</h3><p>View and remove metadata.</p></a>
+            </div>
+        </div>
+
+        <div class="tool-category" data-category="idf">
+            <h2 class="section-title"><span class="material-icons">description</span> IDF Platform</h2>
+            <div class="tool-grid">
+                <a href="idf-platform" class="tool-card"><span class="material-icons">edit_note</span><h3>IDF Editor</h3><p>Create secure documents.</p></a>
+                <a href="idf-platform" class="tool-card"><span class="material-icons">visibility</span><h3>IDF Viewer</h3><p>Open .idf files.</p></a>
+            </div>
+        </div>
+    </main>
+
+    <script src="src/js/tools_home.js"></script>
+    <script>
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const menu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        const toast = document.getElementById('toast');
+
+        menuBtn.onclick = () => { menu.classList.toggle('active'); overlay.classList.toggle('active'); };
+        overlay.onclick = () => { menu.classList.remove('active'); overlay.classList.remove('active'); };
+
+        function showToast(message, type = 'info') {
+            toast.innerHTML = type === 'loading' ? `<div class="toast-spinner"></div><span>${message}</span>` : message;
+            toast.className = `toast show ${type}`;
+            if (type !== 'loading') setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        document.getElementById('refreshCacheItem').onclick = () => {
+            menu.classList.remove('active'); overlay.classList.remove('active');
+            if (navigator.serviceWorker.controller) {
+                showToast('Refreshing cache...', 'loading');
+                navigator.serviceWorker.controller.postMessage({ type: 'RECACHE_ALL' });
+                setTimeout(() => showToast('Cache refreshed successfully!', 'success'), 2000);
+            }
+        };
+    </script>
+</body>
+</html>
