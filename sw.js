@@ -1,55 +1,26 @@
-const CACHE_NAME = 'verticon-tools-v2'; // Incremented version
+/* file: sw.js */
+const CACHE_NAME = 'verticon-tools-v2';
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; 
+const MAX_OFFLINE_DAYS = 14 * 24 * 60 * 60 * 1000; 
+const CACHE_METADATA_KEY = 'cache-metadata';
+const CACHE_EXPIRED_HTML = 'cache_expired';
 
 const FALLBACK_ASSETS = [
-    '/',
-    'index.html',
-    'home',
-    'manifest.json',
-    'favicon.ico',
-    'src/commonstyles.css',
-    'src/commonscript.js',
-    'src/css/landing.css',
-    'src/css/tools_home.css',
-    'src/js/tools_home.js',
-    'src/images/128-128.png',
-    'src/images/512-512.png',
-    'pdf-compress',
-    'src/css/pdf-compress.css',
-    'src/js/pdf-compress.js',
-    'pdf-merge',
-    'src/css/pdf-merge.css',
-    'src/js/pdf-merge.js',
-    'pdf-rearrange',
-    'src/css/pdf-rearrange.css',
-    'src/js/pdf-rearrange.js',
-    'pdf-rotate',
-    'src/css/pdf-rotate.css',
-    'src/js/pdf-rotate.js',
-    'pdf-split',
-    'src/css/pdf-split.css',
-    'src/js/pdf-split.js',
-    'pdf-to-image',
-    'src/css/pdf-to-image.css',
-    'src/js/pdf-to-image.js',
-    'img-compress',
-    'src/css/img-compress.css',
-    'src/js/img-compress.js',
-    'img-convert',
-    'src/css/img-convert.css',
-    'src/js/img-convert.js',
-    'img-resize',
-    'src/css/img-resize.css',
-    'src/js/img-resize.js',
-    'img-to-pdf',
-    'src/css/img-to-pdf.css',
-    'src/js/img-to-pdf.js',
-    'privacy',
-    'terms',
-    'idf-platform',
-    'img_exif',
-    'src/css/img-exif.css',
-    'src/js/img-exif.js',
-    'src/js/img_to_pdf.js' 
+    '/', 'index.html', 'home', 'manifest.json', 'favicon.ico', 'cache_expired',
+    'src/commonstyles.css', 'src/commonscript.js', 'src/css/landing.css',
+    'src/css/tools_home.css', 'src/js/tools_home.js', 'src/images/128-128.png',
+    'src/images/512-512.png', 'pdf-compress', 'src/css/pdf-compress.css',
+    'src/js/pdf-compress.js', 'pdf-merge', 'src/css/pdf-merge.css',
+    'src/js/pdf-merge.js', 'pdf-rearrange', 'src/css/pdf-rearrange.css',
+    'src/js/pdf-rearrange.js', 'pdf-rotate', 'src/css/pdf-rotate.css',
+    'src/js/pdf-rotate.js', 'pdf-split', 'src/css/pdf-split.css',
+    'src/js/pdf-split.js', 'pdf-to-image', 'src/css/pdf-to-image.css',
+    'src/js/pdf-to-image.js', 'img-compress', 'src/css/img-compress.css',
+    'src/js/img-compress.js', 'img-convert', 'src/css/img-convert.css',
+    'src/js/img-convert.js', 'img-resize', 'src/css/img-resize.css',
+    'src/js/img-resize.js', 'img-to-pdf', 'src/css/img-to-pdf.css',
+    'src/js/img-to-pdf.js', 'privacy', 'terms', 'idf-platform', 'img_exif',
+    'src/css/img-exif.css', 'src/js/img-exif.js'
 ];
 
 const EXTERNAL_LIBS = [
@@ -60,59 +31,61 @@ const EXTERNAL_LIBS = [
     'https://fonts.googleapis.com/icon?family=Material+Icons'
 ];
 
-// Install Event
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            // We use map + reflect to ensure one failing URL doesn't break the whole install
-            const allAssets = [...FALLBACK_ASSETS, ...EXTERNAL_LIBS];
-            return Promise.allSettled(
-                allAssets.map(asset => cache.add(asset))
-            );
-        })
-    );
-    self.skipWaiting();
-});
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('VerticonToolsDB', 1);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (e) => e.target.result.createObjectStore('cache-metadata');
+    });
+}
 
-// Activate Event
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
+async function getMetadata() {
+    const db = await openDB();
+    return new Promise(res => {
+        const req = db.transaction('cache-metadata').objectStore('cache-metadata').get(CACHE_METADATA_KEY);
+        req.onsuccess = () => res(req.result || {});
+    });
+}
+
+async function setMetadata(data) {
+    const db = await openDB();
+    db.transaction('cache-metadata', 'readwrite').objectStore('cache-metadata').put(data, CACHE_METADATA_KEY);
+}
+
+async function recacheAll() {
+    const cache = await caches.open(CACHE_NAME);
+    const all = [...FALLBACK_ASSETS, ...EXTERNAL_LIBS];
+    await Promise.allSettled(all.map(a => cache.add(a)));
+    const meta = await getMetadata();
+    all.forEach(a => meta[typeof a === 'string' ? a : a.url] = Date.now());
+    await setMetadata(meta);
+}
+
+self.addEventListener('install', e => { e.waitUntil(recacheAll()); self.skipWaiting(); });
+
+self.addEventListener('activate', e => {
+    e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE_NAME && caches.delete(k)))));
     return self.clients.claim();
 });
 
-// Fetch Event
-self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
+self.addEventListener('message', e => {
+    if (e.data?.type === 'RECACHE_ALL') e.waitUntil(recacheAll());
+});
 
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            if (response) return response;
+self.addEventListener('fetch', e => {
+    e.respondWith(caches.match(e.request).then(async res => {
+        const meta = await getMetadata();
+        const ts = meta[e.request.url];
+        if (res && (Date.now() - ts < CACHE_EXPIRY)) return res;
 
-            return fetch(event.request).then((networkResponse) => {
-                // Check if valid response
-                if (!networkResponse || networkResponse.status !== 200) return networkResponse;
-
-                // Cache local files AND CORS-enabled CDN files
-                if (networkResponse.type === 'basic' || networkResponse.type === 'cors') {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-                }
-
-                return networkResponse;
-            }).catch(() => {
-                if (event.request.mode === 'navigate') return caches.match('index.html');
-            });
-        })
-    );
-
+        return fetch(e.request).then(net => {
+            if (net.status === 200) {
+                const clone = net.clone();
+                caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+                meta[e.request.url] = Date.now();
+                setMetadata(meta);
+            }
+            return net;
+        }).catch(() => res || (e.request.mode === 'navigate' ? caches.match('index.html') : null));
+    }));
 });
