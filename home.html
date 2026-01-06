@@ -1,174 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verticon Tools - Free Online PDF & Image Utilities</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verticon Tools</title>
 
-    <meta name="description" content="Free online tools to merge, split, compress, and convert PDF files and images. Secure, client-side processing for maximum privacy.">
-    <meta name="keywords" content="PDF tools, image tools, client-side, secure, merge PDF, split PDF, compress PDF, convert PDF, image conversion, privacy">
-    <meta name="author" content="Verticon Tech">
-    <meta name="robots" content="index, follow">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="src/commonstyles.css">
+<link rel="stylesheet" href="src/css/tools_home.css">
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="src/commonstyles.css">
-    <link rel="stylesheet" href="src/css/tools_home.css">
+<style>
+/* ---------- HEADER FIX ---------- */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+}
 
-    <style>
-        footer {
-            margin-top: 4rem;
-            padding: 2rem 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #666;
-            border-top: 1px solid #eee;
-        }
+.logo {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
 
-        footer a {
-            color: #667eea;
-            text-decoration: none;
-            margin: 0 0.5rem;
-            font-weight: 600;
-        }
+/* ---------- MOBILE MENU BUTTON ---------- */
+.mobile-menu-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
 
-        footer a:hover {
-            text-decoration: underline;
-        }
+/* ---------- DROPDOWN MENU ---------- */
+.mobile-menu {
+    position: fixed;
+    top: 58px;
+    right: 12px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    display: none;
+    z-index: 2000;
+    overflow: hidden;
+}
 
-        #cacheTimestamp {
-            margin-top: 0.75rem;
-            font-size: 0.85rem;
-            color: #888;
-        }
-    </style>
+.mobile-menu.active {
+    display: block;
+}
+
+.mobile-menu-item {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.mobile-menu-item:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu-item:hover {
+    background: #f7f7f7;
+}
+
+/* ---------- OVERLAY ---------- */
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 1500;
+}
+
+.mobile-menu-overlay.active {
+    display: block;
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+    margin-top: 4rem;
+    padding: 2rem 1rem;
+    text-align: center;
+    font-size: .85rem;
+    color: #666;
+    border-top: 1px solid #eee;
+}
+
+footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#cacheTimestamp {
+    margin-top: 8px;
+    color: #888;
+}
+</style>
 </head>
 
 <body>
 
-<div id="global-loader">
-    <span class="material-icons" style="font-size:3rem;animation:spin 1s linear infinite">sync</span>
-</div>
-
-<header class="fade-in">
+<header>
     <div class="logo">Verticon <span class="logogrey">Tools</span></div>
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
         <span class="material-icons">more_vert</span>
     </button>
 </header>
 
 <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
 <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-item" id="refreshCacheItem">
         <span class="material-icons">refresh</span>
-        <span class="mobile-menu-item-text">Refresh Cache</span>
+        <span>Refresh Cache</span>
     </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<main>
 
-<main class="fade-in">
+<div class="search-container">
+    <input type="text" class="tool-search" placeholder="Find a tool (e.g. Merge, Split, Convert)...">
+</div>
 
-    <div class="search-container">
-        <input type="text" class="tool-search" placeholder="Find a tool (e.g. Merge, Split, Convert)...">
+<div class="tool-category">
+    <h2 class="section-title"><span class="material-icons">picture_as_pdf</span> PDF Utilities</h2>
+    <div class="tool-grid">
+        <a href="pdf-merge" class="tool-card"><h3>Merge PDF</h3><p>Combine multiple PDFs.</p></a>
+        <a href="pdf-split" class="tool-card"><h3>Split PDF</h3><p>Split pages or ranges.</p></a>
+        <a href="pdf-compress" class="tool-card"><h3>Compress PDF</h3><p>Reduce size safely.</p></a>
     </div>
+</div>
 
-    <div class="tool-category">
-        <h2 class="section-title">
-            <span class="material-icons">picture_as_pdf</span> PDF Utilities
-        </h2>
-        <div class="tool-grid">
-            <a href="pdf-merge" class="tool-card"><span class="material-icons">call_merge</span><h3>Merge PDF</h3><p>Combine multiple PDFs.</p></a>
-            <a href="pdf-split" class="tool-card"><span class="material-icons">call_split</span><h3>Split PDF</h3><p>Split pages or ranges.</p></a>
-            <a href="pdf-compress" class="tool-card"><span class="material-icons">compress</span><h3>Compress PDF</h3><p>No aggressive quality loss.</p></a>
-            <a href="pdf-rearrange" class="tool-card"><span class="material-icons">grid_view</span><h3>Rearrange PDF</h3><p>Sort and remove pages.</p></a>
-            <a href="pdf-rotate" class="tool-card"><span class="material-icons">rotate_right</span><h3>Rotate PDF</h3><p>Rotate pages.</p></a>
-            <a href="pdf-to-image" class="tool-card"><span class="material-icons">image</span><h3>PDF to Image</h3><p>Convert pages to images.</p></a>
-        </div>
+<div class="tool-category">
+    <h2 class="section-title"><span class="material-icons">image</span> Image Utilities</h2>
+    <div class="tool-grid">
+        <a href="img-convert" class="tool-card"><h3>Convert Image</h3></a>
+        <a href="img-compress" class="tool-card"><h3>Compress Image</h3></a>
+        <a href="img-resize" class="tool-card"><h3>Resize Image</h3></a>
+        <a href="img-exif" class="tool-card"><h3>EXIF Editor</h3></a>
     </div>
-
-    <div class="tool-category">
-        <h2 class="section-title">
-            <span class="material-icons">image</span> Image Utilities
-        </h2>
-        <div class="tool-grid">
-            <a href="img-convert" class="tool-card"><span class="material-icons">transform</span><h3>Image Converter</h3><p>PNG, JPG, WEBP.</p></a>
-            <a href="img-compress" class="tool-card"><span class="material-icons">photo_size_select_small</span><h3>Image Compressor</h3><p>Client-side compression.</p></a>
-            <a href="img-resize" class="tool-card"><span class="material-icons">aspect_ratio</span><h3>Image Resizer</h3><p>Resize and format.</p></a>
-            <a href="img-exif" class="tool-card"><span class="material-icons">info</span><h3>EXIF Editor</h3><p>View and remove metadata.</p></a>
-        </div>
-    </div>
-
-    <div class="tool-category">
-        <h2 class="section-title">
-            <span class="material-icons">description</span> IDF Platform
-        </h2>
-        <div class="tool-grid">
-            <a href="idf-platform" class="tool-card"><span class="material-icons">edit_note</span><h3>IDF Editor</h3><p>Create interactive documents.</p></a>
-            <a href="idf-platform" class="tool-card"><span class="material-icons">visibility</span><h3>IDF Viewer</h3><p>Open .idf files.</p></a>
-        </div>
-    </div>
+</div>
 
 </main>
 
 <footer>
     <div>
-        <a href="/privacy">Privacy</a> ·
-        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
     </div>
     <div id="cacheTimestamp">Cache last refreshed: checking…</div>
 </footer>
 
-<script src="src/commonscript.js"></script>
-<script src="src/js/tools_home.js"></script>
-
 <script>
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const refreshBtn = document.getElementById('refreshCacheItem');
-    const toast = document.getElementById('toast');
+const menuBtn = document.getElementById('mobileMenuBtn');
+const menu = document.getElementById('mobileMenu');
+const overlay = document.getElementById('mobileMenuOverlay');
+const refreshBtn = document.getElementById('refreshCacheItem');
+const tsEl = document.getElementById('cacheTimestamp');
 
-    mobileMenuBtn.onclick = () => {
-        mobileMenu.classList.toggle('active');
-        overlay.classList.toggle('active');
-    };
+menuBtn.onclick = () => {
+    menu.classList.toggle('active');
+    overlay.classList.toggle('active');
+};
 
-    overlay.onclick = () => {
-        mobileMenu.classList.remove('active');
-        overlay.classList.remove('active');
-    };
+overlay.onclick = () => {
+    menu.classList.remove('active');
+    overlay.classList.remove('active');
+};
 
-    function showToast(msg, type = '') {
-        toast.textContent = msg;
-        toast.className = `toast show ${type}`;
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    refreshBtn.onclick = () => {
-        if (!navigator.serviceWorker?.controller) {
-            showToast('Service Worker not active', 'error');
-            return;
-        }
+refreshBtn.onclick = () => {
+    if (navigator.serviceWorker?.controller) {
         navigator.serviceWorker.controller.postMessage({ type: 'RECACHE_ALL' });
         localStorage.setItem('lastCacheRefresh', Date.now());
-        updateTimestamp();
-        showToast('Cache refresh started', 'success');
-    };
-
-    function updateTimestamp() {
-        const el = document.getElementById('cacheTimestamp');
-        const ts = localStorage.getItem('lastCacheRefresh');
-        if (!ts) {
-            el.textContent = 'Cache last refreshed: never';
-            return;
-        }
-        el.textContent = 'Cache last refreshed: ' + new Date(+ts).toLocaleString();
+        updateTS();
     }
+    menu.classList.remove('active');
+    overlay.classList.remove('active');
+};
 
-    updateTimestamp();
+function updateTS() {
+    const ts = localStorage.getItem('lastCacheRefresh');
+    tsEl.textContent = ts
+        ? 'Cache last refreshed: ' + new Date(+ts).toLocaleString()
+        : 'Cache last refreshed: never';
+}
+
+updateTS();
 </script>
 
 </body>
